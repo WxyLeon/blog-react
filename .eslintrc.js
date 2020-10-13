@@ -109,5 +109,7 @@ module.exports = {
     'class-methods-use-this': ERROR,
     'jsx-quotes': [ERROR, 'prefer-single'],
     'global-require': OFF,
+    // 'linebreak-style': ['error', 'window'],
+    // 'linebreak-style': ['error', 'always']
   },
 };

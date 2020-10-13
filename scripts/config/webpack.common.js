@@ -17,48 +17,53 @@ const getCssLoaders = (importLoaders) => [
   {
     loader: 'postcss-loader',
     options: {
-      postcssOptions: {
-        plugins: [
-          'postcss-preset-env',
-          'postcss-flexbugs-fixes',
-          [
-            PostcssPresetEnv({
-              autoprefixer: {
-                grid: true,
-                flexbox: 'no-2009',
-              },
-              stage: 3,
-            }),
-          ],
-          'postcss-normalize',
-        ],
-        sourceMap: isDev,
-      },
-      //   ident: 'postcss',
+      // postcssOptions: {
       //   plugins: [
-      //     // 修复一些和 flex 布局相关的 bug
-      //     require('postcss-flexbugs-fixes'),
-      //     require('postcss-preset-env')({
-      // autoprefixer: {
-      //   grid: true,
-      //   flexbox: 'no-2009',
-      // },
-      // stage: 3,
-      //     }),
-      //     require('postcss-normalize'),
+      //     'postcss-preset-env',
+      //     'postcss-flexbugs-fixes',
+      //     [
+      //       PostcssPresetEnv({
+      //         autoprefixer: {
+      //           grid: true,
+      //           flexbox: 'no-2009',
+      //         },
+      //         stage: 3,
+      //       }),
+      //     ],
+      //     'postcss-normalize',
       //   ],
       //   sourceMap: isDev,
+      // },
+      postcssOptions: {
+        ident: 'postcss',
+        plugins: [
+          // 修复一些和 flex 布局相关的 bug
+          require('postcss-flexbugs-fixes'),
+          require('postcss-preset-env')({
+      autoprefixer: {
+        grid: true,
+        flexbox: 'no-2009',
+      },
+      stage: 3,
+          }),
+          require('postcss-normalize'),
+        ],
+        sourceMap: isDev,
+      }
     },
   },
 ];
 
 module.exports = {
   entry: {
-    app: resolve(PROJECT_PATH, './src/app.js'),
+    app: resolve(PROJECT_PATH, './src/index.tsx'),
   },
   output: {
     filename: `js/[name]${isDev ? '' : '.[contenthash:8]'}.js`,
     path: resolve(PROJECT_PATH, './dist'),
+  },
+  resolve: {
+    extensions: ['.tsx', '.ts', '.js', '.json'],
   },
   plugins: [
     new HtmlWebpackPlugin({
@@ -137,6 +142,12 @@ module.exports = {
             },
           },
         ],
+      },
+      {
+        test: /\.(tsx?|js)$/,
+        loader: 'babel-loader',
+        options: { cacheDirectory: true },
+        exclude: /node_modules/,
       },
     ],
   },
