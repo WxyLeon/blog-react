@@ -11,12 +11,6 @@
     "lint-eslint": "eslint -c .eslintrc.js --ext .ts,.tsx,.js src",
     "lint-stylelint": "stylelint --config .stylelintrc.js src/**/*.{less,css,scss}"
   },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged",
-      "commit-msg": "commitlint --config .commitlintrc.js -E HUSKY_GIT_PARAMS"
-    }
-  },
   "lint-staged": {
     "*.{ts,tsx,js}": [
       "eslint --config .eslintrc.js"
@@ -56,11 +50,13 @@
     "@babel/preset-typescript": "^7.10.4",
     "@types/react": "^16.9.52",
     "@types/react-dom": "^16.9.8",
+    "@types/webpack-env": "^1.15.3",
     "@typescript-eslint/eslint-plugin": "^4.4.0",
     "@typescript-eslint/parser": "^4.4.0",
     "autoprefixer": "^10.0.1",
     "babel-loader": "^8.1.0",
     "clean-webpack-plugin": "^3.0.0",
+    "copy-webpack-plugin": "^6.2.1",
     "cross-env": "^7.0.2",
     "css-loader": "^4.3.0",
     "eslint": "^7.11.0",
@@ -74,6 +70,9 @@
     "eslint-plugin-react-hooks": "^4.1.2",
     "eslint-plugin-unicorn": "^20.1.0",
     "file-loader": "^6.1.1",
+    "fork-ts-checker-webpack-plugin": "^5.2.0",
+    "glob": "^7.1.6",
+    "hard-source-webpack-plugin": "^0.13.1",
     "html-webpack-plugin": "^4.5.0",
     "husky": "^4.3.0",
     "less": "^3.12.2",
@@ -86,6 +85,7 @@
     "postcss-normalize": "^9.0.0",
     "postcss-preset-env": "^6.7.0",
     "prettier": "^2.1.2",
+    "purgecss-webpack-plugin": "^3.0.0",
     "sass-loader": "^10.0.3",
     "style-loader": "^2.0.0",
     "stylelint": "^13.7.2",
@@ -100,7 +100,8 @@
     "webpack": "^4.44.2",
     "webpack-cli": "^3.3.12",
     "webpack-dev-server": "^3.11.0",
-    "webpack-merge": "^5.2.0"
+    "webpack-merge": "^5.2.0",
+    "webpackbar": "^4.0.0"
   },
   "browserslist": [
     ">0.2%",

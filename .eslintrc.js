@@ -102,14 +102,13 @@ module.exports = {
     // indent: [ERROR, 2, { SwitchCase: 1 }],
     'linebreak-style': [ERROR, 'unix'],
     quotes: [ERROR, 'single'],
-    semi: [ERROR, 'always'],
+    semi: [ERROR, 'never'],
     'no-unused-expressions': WARN,
     'no-plusplus': OFF,
     'no-console': OFF,
     'class-methods-use-this': ERROR,
     'jsx-quotes': [ERROR, 'prefer-single'],
     'global-require': OFF,
-    // 'linebreak-style': ['error', 'window'],
-    // 'linebreak-style': ['error', 'always']
+    'no-use-before-define': ['error', { react: false }],
   },
 };
