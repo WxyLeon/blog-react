@@ -1,12 +1,13 @@
 const { resolve } = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const PostcssPresetEnv = require('postcss-preset-env');
-const { isDev, PROJECT_PATH } = require('../constants');
 const CopyPlugin = require('copy-webpack-plugin');
 const WebpackBar = require('webpackbar');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const HardSourceWebpackPlugin = require('hard-source-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
+const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
+const { isDev, PROJECT_PATH, IS_OPEN_HARD_SOURCE } = require('../constants');
 
 const getCssLoaders = (importLoaders) => [
   isDev ? 'style-loader' : MiniCssExtractPlugin.loader,
@@ -69,68 +70,10 @@ module.exports = {
   resolve: {
     extensions: ['.tsx', '.ts', '.js', '.json'],
     alias: {
-      '@': resolve(PROJECT_PATH, './src'),
+      Src: resolve(PROJECT_PATH, './src'),
+      Common: resolve(PROJECT_PATH, './src/common'),
       Components: resolve(PROJECT_PATH, './src/components'),
       Utils: resolve(PROJECT_PATH, './src/utils'),
-    },
-  },
-  plugins: [
-    new HtmlWebpackPlugin({
-      template: resolve(PROJECT_PATH, './public/index.html'),
-      filename: 'index.html',
-      cache: false, // 特别重要：防止之后使用v6版本 copy-webpack-plugin 时代码修改一刷新页面为空问题。
-      minify: isDev
-        ? false
-        : {
-            removeAttributeQuotes: true,
-            collapseWhitespace: true,
-            removeComments: true,
-            collapseBooleanAttributes: true,
-            collapseInlineTagWhitespace: true,
-            removeRedundantAttributes: true,
-            removeScriptTypeAttributes: true,
-            removeStyleLinkTypeAttributes: true,
-            minifyCSS: true,
-            minifyJS: true,
-            minifyURLs: true,
-            useShortDoctype: true,
-          },
-    }),
-    new CopyPlugin({
-      patterns: [
-        {
-          context: resolve(PROJECT_PATH, './public'),
-          from: '*',
-          to: resolve(PROJECT_PATH, './dist'),
-          toType: 'dir',
-        },
-      ],
-    }),
-    new WebpackBar({
-      name: isDev ? '正在启动' : '正在打包',
-      color: '#fa8c16',
-    }),
-    new ForkTsCheckerWebpackPlugin({
-      typescript: {
-        configFile: resolve(PROJECT_PATH, './tsconfig.json'),
-      },
-    }),
-    new HardSourceWebpackPlugin(),
-    !isDev &&
-      new MiniCssExtractPlugin({
-        filename: 'css/[name].[contenthash:8].css',
-        chunkFilename: 'css/[name].[contenthash:8].css',
-        ignoreOrder: false,
-      }),
-  ],
-  externals: {
-    react: 'React',
-    'react-dom': 'ReactDOM',
-  },
-  optimization: {
-    splitChunks: {
-      chunks: 'all',
-      name: true,
     },
   },
   module: {
@@ -195,5 +138,75 @@ module.exports = {
         ],
       },
     ],
+  },
+  plugins: [
+    new HtmlWebpackPlugin({
+      template: resolve(PROJECT_PATH, './public/index.html'),
+      filename: 'index.html',
+      cache: false,
+      minify: isDev
+        ? false
+        : {
+            removeAttributeQuotes: true,
+            collapseWhitespace: true,
+            removeComments: true,
+            collapseBooleanAttributes: true,
+            collapseInlineTagWhitespace: true,
+            removeRedundantAttributes: true,
+            removeScriptTypeAttributes: true,
+            removeStyleLinkTypeAttributes: true,
+            minifyCSS: true,
+            minifyJS: true,
+            minifyURLs: true,
+            useShortDoctype: true,
+          },
+    }),
+    new CopyPlugin({
+      patterns: [
+        {
+          context: resolve(PROJECT_PATH, './public'),
+          from: '*',
+          to: resolve(PROJECT_PATH, './dist'),
+          toType: 'dir',
+        },
+      ],
+    }),
+    new WebpackBar({
+      name: isDev ? '正在启动' : '正在打包',
+      color: '#fa8c16',
+    }),
+    new ForkTsCheckerWebpackPlugin({
+      typescript: {
+        configFile: resolve(PROJECT_PATH, './tsconfig.json'),
+      },
+    }),
+    IS_OPEN_HARD_SOURCE && new HardSourceWebpackPlugin(),
+    !isDev &&
+      new MiniCssExtractPlugin({
+        filename: 'css/[name].[contenthash:8].css',
+        chunkFilename: 'css/[name].[contenthash:8].css',
+        ignoreOrder: false,
+      }),
+  ].filter(Boolean),
+  externals: {
+    react: 'React',
+    'react-dom': 'ReactDOM',
+  },
+  optimization: {
+    minimize: !isDev,
+    minimizer: [
+      !isDev &&
+        new TerserPlugin({
+          extractComments: false,
+          terserOptions: {
+            compress: { pure_funcs: ['console.log'] },
+          },
+        }),
+      !isDev && new OptimizeCssAssetsPlugin(),
+    ].filter(Boolean),
+    splitChunks: {
+      chunks: 'all',
+      name: true,
+    },
   },
 };
